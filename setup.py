@@ -20,6 +20,7 @@ setup(
     entry_points={
         "console_scripts": [
             "marker = comprobo_warmup.marker:main",
+            "teleop = comprobot_warmup.teleop:main"
         ],
     },
 )
