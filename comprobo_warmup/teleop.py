@@ -17,6 +17,9 @@ key_binds = {
 }
 
 class TeleopPublisher(Node):
+    """
+    Publisher for cmd_vel topic
+    """
     def __init__(self):
         super().__init__("teleop")
         self.pub = self.create_publisher(Twist, 'cmd_vel', 10)
@@ -24,6 +27,9 @@ class TeleopPublisher(Node):
         
 
 def getKey(settings):
+    """
+    Get the current key pressed
+    """
     tty.setraw(sys.stdin.fileno())
     select.select([sys.stdin], [], [], 0)
     key = sys.stdin.read(1)
@@ -32,6 +38,10 @@ def getKey(settings):
 
 
 def main(args=None):
+    """
+    Allow control of the robot using keys
+    i, k, m, j, l, u, o
+    """
     rclpy.init(args=args)
     tp = TeleopPublisher()
     settings = termios.tcgetattr(sys.stdin)
