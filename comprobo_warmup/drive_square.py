@@ -5,22 +5,24 @@ from geometry_msgs.msg import Twist
 
 
 class DriveSquarePublisher(Node):
+    """
+    Node for driving neato in a 1m by 1m square
+    """
     def __init__(self):
         super().__init__("drive_square")
         self.pub = self.create_publisher(Twist, 'cmd_vel', 10)
-        # TODO: Find a better way to run this than a timer
-        self.create_timer(30, self.drive_square)
 
     def drive_square(self):
+        """
+        Drive in a 1m by 1m square
+        """
         msg = Twist()
         self.stop(msg)
-        self.straight(msg)
-        self.turn_90(msg)
-        self.straight(msg)
-        self.turn_90(msg)
-        self.straight(msg)
-        self.turn_90(msg)
-        self.straight(msg)
+        for i in range(4):
+            self.stop(msg)
+            self.straight(msg)
+            self.stop(msg)
+            self.turn_90(msg)
         self.stop(msg)
     
     def straight(self, msg):
@@ -39,12 +41,13 @@ class DriveSquarePublisher(Node):
         msg.linear.x = 0.0
         msg.angular.z = 0.0
         self.pub.publish(msg)
+        time.sleep(1)
 
 
 def main(args=None):
     rclpy.init(args=args)
-    drive_square_publisher = DriveSquarePublisher()
-    rclpy.spin(drive_square_publisher)
+    dsp = DriveSquarePublisher()
+    dsp.drive_square()
     rclpy.shutdown()
 
 
