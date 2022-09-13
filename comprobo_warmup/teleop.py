@@ -6,6 +6,16 @@ import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
 
+key_binds = {
+    "i": (1.0, 0.0, 0.0, 0.0),
+    "k": (0.0, 0.0, 0.0, 0.0),
+    "m": (-1.0, 0.0, 0.0, 0.0),
+    "j": (0.5, 0.0, 0.0, 1.0),
+    "l": (0.5, 0.0, 0.0, -1.0),
+    "u": (0.0, 0.0, 0.0, 1.0),
+    "o": (0.0, 0.0, 0.0, -1.0)
+}
+
 class TeleopPublisher(Node):
     def __init__(self):
         super().__init__("teleop")
@@ -14,24 +24,23 @@ class TeleopPublisher(Node):
     
     def run_teleop(self):
         """
-        Wait for key presses
-        Get the key
-        Send the relevant Twist command
+        Watch for key presses and
+        Send corresponding velocities
         """
         settings = termios.tcgetattr(sys.stdin)
         key = None
         msg = Twist()
-        while key := '\x03':
+        # TODO: Make control-c work
+        while True:
             key = self.getKey(settings)
-            if key == "i":
-                msg = Twist()
-                msg.linear.x = 1.0
+            if key == '\x03':
+                return
+            if key in key_binds.keys():
+                msg.linear.x = key_binds[key][0]
+                msg.linear.y = key_binds[key][1]
+                msg.linear.z = key_binds[key][2] 
+                msg.angular.z = key_binds[key][3]
                 self.pub.publish(msg)
-            if key == "m":
-                msg = Twist()
-                msg.linear.x = -1.0
-                self.pub.publish(msg)
-        return
 
     @staticmethod
     def getKey(settings):
