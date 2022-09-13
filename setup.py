@@ -20,7 +20,8 @@ setup(
     entry_points={
         "console_scripts": [
             "marker = comprobo_warmup.marker:main",
-            "teleop = comprobo_warmup.teleop:main"
+            "teleop = comprobo_warmup.teleop:main",
+            "drive_square = comprobo_warmup.drive_square:main",
         ],
     },
 )
