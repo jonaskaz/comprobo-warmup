@@ -14,67 +14,87 @@ class PersonFollowerPublisher(Node):
         self.centroid_pub = self.create_publisher(Marker, "visualization_marker", 10)
         self.sub = self.create_subscription(LaserScan, 'scan', self.process_scan, 10)
         self.msg = Twist()
-        self.cartesian_x = []
-        self.cartesian_y = []
-        self.centroid = [0, 0]
-        self.mag = 0.0
-        self.theta = 0.0
+        self.follow_distance = 2
         self.p = 1
         self.fov = 20
         self.marker = Marker()
     
     def process_scan(self, scan):
-        self.to_cartesian(scan)
-        if len(self.cartesian_x) <= 0:
-            return
-        self.get_centroid()
-        self.publish_centroid_marker()
-        self.centroid_to_polar()
-        self.send_follow_vel()
+        x, y = self.to_cartesian(scan)
+        if len(x) == 0 or len(y) == 0:
+            self.set_stop_msg()
+        else:
+            x_center, y_center = self.get_centroid(x, y)
+            self.publish_marker(x_center, y_center)
+            theta, mag = self.to_polar(x_center, y_center)
+            self.update_msg(theta, mag)
+        print(self.msg.linear.x)
+        print(self.msg.angular.z)
         self.pub.publish(self.msg)
+    
+    def set_stop_msg(self):
+        self.msg.linear.x = 0.0
+        self.msg.angular.z = 0.0
+
+    def get_valid_fov_indexes(self, scan):
+        """
+        Neato heading of 0 degrees is aligned with linear x direction
+        """
+        valid_indexes = []
+
+        # Get the number of scan values that make up the fov
+        index_fov = int(len(scan.ranges) / 360 * self.fov)
+
+        # Add the first half of the scan values in the fov
+        valid_indexes.append(range(int(index_fov/2)))
+
+        # Add the last half of the scan values in the fov
+        valid_indexes.append(range(int(len(scan.ranges) - index_fov/2), len(scan.ranges)))
+
+        return valid_indexes
 
     def to_cartesian(self, scan):
         """
-        sin() = y value / range
-        cos() = x value / range
+        sin(theta) = y value / range
+        cos(theta) = x value / range
         """
-        self.cartesian_x = []
-        self.cartesian_y = []
-        index_fov = int(len(scan.ranges) / 100 * self.fov)
-        min_index_max = index_fov/2
-        max_index_min = int(len(scan.ranges) - index_fov/2)
+        cartesian_x = []
+        cartesian_y = []
+        valid_indexes = self.get_valid_fov_indexes(scan)
         for i, v in enumerate(scan.ranges):
-            if i > min_index_max and i < max_index_min:
+            if i in valid_indexes:
                 continue
             y = math.sin(scan.angle_increment * i) * v
             x = math.cos(scan.angle_increment * i) * v
             if y != inf and y != -inf and x != inf and x != -inf:
-                self.cartesian_y.append(y)
-                self.cartesian_x.append(x)
+                cartesian_y.append(y)
+                cartesian_x.append(x)
+        return cartesian_x, cartesian_y
+            
 
-    def get_centroid(self):
-        self.centroid[0] = sum(self.cartesian_x) / len(self.cartesian_x)
-        self.centroid[1] = sum(self.cartesian_y) / len(self.cartesian_y)
+    def get_centroid(self, x, y):
+        x_mean = sum(x) / len(x)
+        y_mean = sum(y) / len(y)
+        return x_mean, y_mean
     
-    def centroid_to_polar(self):
-        self.theta = math.atan(self.centroid[0]/self.centroid[1])
-        self.mag = math.tan(self.centroid[0]/self.centroid[1])
+    def to_polar(self, x, y):
+        theta = math.atan(x/y)
+        mag = math.tan(x/y)
+        return theta, mag
         
-    def send_follow_vel(self):
-        print(self.mag)
-        print(self.theta)
-        self.msg.linear.x = 0.0#self.mag
-        self.msg.angular.z = 0.0#self.theta/4
+    def update_msg(self, theta, mag):
+        self.msg.linear.x = mag
+        self.msg.angular.z = theta
 
-    def publish_centroid_marker(self):
+    def publish_marker(self, x, y):
         self.marker.header.frame_id = "base_link"
         self.marker.header.stamp = self.get_clock().now().to_msg()
         self.marker.id = 0
 
         self.marker.type = Marker.SPHERE
         self.marker.action = Marker.ADD
-        self.marker.pose.position.x = self.centroid[0]
-        self.marker.pose.position.y = self.centroid[1]
+        self.marker.pose.position.x = x
+        self.marker.pose.position.y = y
         self.marker.pose.position.z = 0.0
         self.marker.pose.orientation.x = 0.0
         self.marker.pose.orientation.y = 0.0
