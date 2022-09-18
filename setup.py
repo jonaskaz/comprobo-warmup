@@ -22,7 +22,9 @@ setup(
             "marker = comprobo_warmup.marker:main",
             "teleop = comprobo_warmup.teleop:main",
             "drive_square = comprobo_warmup.drive_square:main",
+            "wall_follower = comprobo_warmup.wall_follower:main",
             "person_follower = comprobo_warmup.person_follower:main",
+            "obstacle_avoid = comprobo_warmup.obstacle_avoid:main"
         ],
     },
 )
