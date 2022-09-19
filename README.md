@@ -1,9 +1,9 @@
 # comprobo-warmup
 Olin Fall 2022 Computational Robotics Course Warmup Project  
+Jonas Kazlauskas and Luke Raus
 ## Introduction
-TODO
+Below are a series of behaviors we created to control a neato robot in order to learn ros2 and build an understanding of robotics controls.
 ## Robot Teleop
-### Description
 Robot teleoperation is intended to allow a user to manually control a robot. We used the keyboard as our manual input controller.
 
 ### Diagram
@@ -20,10 +20,9 @@ Below are the keybindings we created for controlling the robot:
 
 ### Strategy
 
-A node was created to handle reading keyboard input and transforming it into robot commands. Key presses are read and are used to reference a dictionary of robot velocities. These velocities are then sent to the robot. We chose to let the robot continue executing the last pressed key to remove the need for holding down commands. This strategy was more simple to implement and removed the need to send continuous commands to the robot. However, if connection is lost the robot will continue driving rather than stopping which could be potentially dangerous in certain applications.
+A node was created to handle reading keyboard input and transforming it into robot commands. Key presses are read and used to reference a dictionary of robot velocities. These velocities are then sent to the robot. We chose to let the robot continue executing the last pressed key to remove the need for holding down commands. This strategy reduced the overall number of messages sent to the robot. However, if connection is lost the robot will continue driving rather than stopping.
 
 ## Drive Square
-### Description
 Drive square is a intended to direct the robot to drive in a 1m by 1m square. 
 
 ### Diagram
@@ -31,18 +30,15 @@ Drive square is a intended to direct the robot to drive in a 1m by 1m square.
 The desired behavior of the robot is shown above. 
 
 ### Strategy
-There are two main ways to approach this problem: odometry and timing. We chose to use the simpler of the two and used timing the approximate distances and rotations for the robot. Instead of using the ros built-in time, we used Python's time.sleep() function. Based on the velocity commands given to the robot we set a delay that would result in the desired final position. Using time.sleep is not optimal as it does not always match up with ros time, especially in simulations when time can be manipulated. However, for this simple implementation we were able to consistently drive a square.
+We used timing to approximate distances and rotations for the robot. Based on the velocity commands given to the robot we set a delay that would result in the desired final position. We would love to improved on this design in the future by using odometry to better approximate robot position while it drives.
 
 ## Wall Follower
-
-### Description
 
 ### Diagram
 
 ### Strategy
 
 ## Person Follower
-### Description
 The goal of the person follower is to direct a robot to follow a person as they walk and move away from the robot. This behavior should keep the robot at a specified distance from the person and stop when there is not a person detected. Lidar scan data is used to 
 
 ### Diagram
@@ -59,15 +55,22 @@ Our algorithm at a high level:
 - Instruct the robot to drive along the vector
 
 Field of View  
-In order to prevent the robot from following walls and other large objects rather than a person, a field of view and maximum distance was used. To do this, only specific indexes of the laser scan data was used, and any values above the maximum distance were removed.
+In order to prevent the robot from following walls and other large objects rather than a person, a field of view and maximum distance was used. To do this, only specific indexes of the laser scan data were used, and any values above the maximum distance were removed.
 
 Finding the centroid  
 The laser scan data is returned in polar coordinates with the robot at the origin. In order to easily find the centroid, we converted the data to cartesian coordinates using sine and cosine. We could then take the mean of the x and y values to find the centroid. 
 
 Instructing the robot  
-After finding the centroid in cartesian it was converted back to polar coordinates. Then, a specific follow distance was removed from the magnitude of the vector. The direction and magnitude were then multiplied by corresponding p values and sent directly to the robot's velocity command. This is a proportional controller because the farther the robot is from the person centroid the larger the velocity commands will be sent. 
+After finding the centroid in cartesian we converted it back to polar coordinates. Next, a specific follow distance was removed from the magnitude of the vector. The direction and magnitude were then multiplied by corresponding p values and sent directly to the robot's velocity command. This proportional controller allowed the robot to move more quickly when farther from the person in order to catch up.
 
-One improvement in the future could be to find the centroid of the laser scan without converting to cartesian coordinates. This would reduce the code complexity and potentially allow us to directly send the centroid to the robot.
+### Demo
+
+![Person Follower Demo](diagrams/gifs/person_follower.gif)
+
+This video was recorded on a neato robot in a hallway. In this video the heading of the neato is always facing upward. The green spot indicates the identified person. We can see how the robot attempts the keep the person directly in front of it as it navigates within the hallway, ignoring walls.
+
+One improvement in the future could be to find the centroid of the laser scan without converting to cartesian coordinates. This would reduce the code complexity and allow us to directly send the centroid to the robot.
+
 
 ## Obstacle Avoidance
 
@@ -76,3 +79,36 @@ One improvement in the future could be to find the centroid of the laser scan wi
 ### Diagram
 
 ### Strategy
+
+## Finite State Controller
+
+### Description
+A finite state controller is a way of controlling a robot by defining a set of known states that the robot can be in. In this type of controller it is required that states and transitions between states are defined. The below diagram shows these definitions:
+
+### Diagram
+
+![Finite State Controller Diagram](diagrams/finite_state_controller.jpg)
+
+In our implementation, the robot begins by driving in a circle. If it finds a wall within a certain range, the robot will then follow the wall. When a wall is no longer in range, it will return to driving in a circle.
+
+### Strategy
+
+The state of the robot is tracked by an enum, which is periodically checked by our loop. Commands are being constantly sent to the robot depending on the state. A separate loop is updating the state based on the latest laser scan data. Currently all the code is structured under one main class that handles controls. In the future we would like to improve this design by creating an abstract controller without hard coded states and transitions. 
+
+### Demo
+![Finite State Controller Demo](diagrams/gifs/finite_state_controller.gif)
+
+This video was recorded on a neato in a large hallway. We can the see the robot begin by turning in a circle until it reaches the wall. At that point it aligns with the wall and begins driving along it.
+
+
+## Code Structure
+For each behavior we created a new ros node. Each node is a Python class that holds parameters, constants, and relevant methods. Each node subscribes and publishes to other nodes in order to retrieve robot data and send commands to the robot. Many behavors inlcude a process_scan and run_loop method. Process scan handles processing and filtering laserscan data and updating class attributes. The run_loop method is continously reading class attributes and sending commands to the robot. This design structure decouples the robot behavior from any particular input. For example we could add another sensor that updates our class attributes without needing to change our run_loop method.
+
+## Challenges
+
+
+
+## Key Takeaways
+- Using visualizations can help debug tremendously
+- 
+
