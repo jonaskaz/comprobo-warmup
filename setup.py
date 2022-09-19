@@ -24,7 +24,8 @@ setup(
             "drive_square = comprobo_warmup.drive_square:main",
             "wall_follower = comprobo_warmup.wall_follower:main",
             "person_follower = comprobo_warmup.person_follower:main",
-            "obstacle_avoid = comprobo_warmup.obstacle_avoid:main"
+            "obstacle_avoid = comprobo_warmup.obstacle_avoid:main",
+            "finite_state_controller = comprobo_warmup.finite_state_controller:main"
         ],
     },
 )
