@@ -105,10 +105,15 @@ This video was recorded on a neato in a large hallway. We can the see the robot 
 For each behavior we created a new ros node. Each node is a Python class that holds parameters, constants, and relevant methods. Each node subscribes and publishes to other nodes in order to retrieve robot data and send commands to the robot. Many behavors inlcude a process_scan and run_loop method. Process scan handles processing and filtering laserscan data and updating class attributes. The run_loop method is continously reading class attributes and sending commands to the robot. This design structure decouples the robot behavior from any particular input. For example we could add another sensor that updates our class attributes without needing to change our run_loop method.
 
 ## Challenges
+A large challenge for us was debugging robot behavior, especially in the person follower. There were some problems with our cartesian coordinate conversions that were resulting in unexpected robot behavior. Our normal debugging strategies were not able to solve the problem and it was only after visualizing the centroid of the person that we realized where the error was coming from. Running a visualization test earlier on would prevent bugs from propogating down the line. We plan to test earlier in the future. 
 
+Another challenege we faced was setting up the ros package in the beginning. There were a few minor steps that we were missing that prevented us from running our python code such as sourcing the setup.bash file. However after solving these problems adding in future nodes was a breeze. 
 
 
 ## Key Takeaways
 - Using visualizations can help debug tremendously
-- 
+- Start small and check functionality as you go
+- Diagraming and discussing the problem before starting to write any code can be extremely helpful
+- The robot will never perform perfectly in every situation - edge cases will always exist
+
 
