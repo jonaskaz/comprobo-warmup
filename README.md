@@ -30,7 +30,7 @@ Drive square is a intended to direct the robot to drive in a 1m by 1m square.
 The desired behavior of the robot is shown above. 
 
 ### Strategy
-We used timing to approximate distances and rotations for the robot. Based on the velocity commands given to the robot we set a delay that would result in the desired final position. We would love to improved on this design in the future by using odometry to better approximate robot position while it drives.
+We used timing to approximate distances and rotations for the robot. Based on the velocity commands given to the robot we set a delay that would result in the desired final position. We would love to improve on this design in the future by using odometry to better approximate robot position while it drives.
 
 ## Wall Follower
 
@@ -39,7 +39,7 @@ We used timing to approximate distances and rotations for the robot. Based on th
 ### Strategy
 
 ## Person Follower
-The goal of the person follower is to direct a robot to follow a person as they walk and move away from the robot. This behavior should keep the robot at a specified distance from the person and stop when there is not a person detected. Lidar scan data is used to 
+The goal of the person follower is to direct a robot to follow a person as they walk and move away from the robot. This behavior should keep the robot at a specified distance from the person and stop when there is not a person detected.
 
 ### Diagram
 
@@ -51,7 +51,7 @@ Our algorithm at a high level:
 - Retrieve laser scan data within a specific field of view
 - Find the centroid (shown in green) of the laser scan data
 - Find a vector that will move the robot from its current position to the centroid.
-- Subtract a set follow distance from the vector
+- Subtract a follow distance from the vector
 - Instruct the robot to drive along the vector
 
 Field of View  
@@ -107,7 +107,7 @@ For each behavior we created a new ros node. Each node is a Python class that ho
 ## Challenges
 A large challenge for us was debugging robot behavior, especially in the person follower. There were some problems with our cartesian coordinate conversions that were resulting in unexpected robot behavior. Our normal debugging strategies were not able to solve the problem and it was only after visualizing the centroid of the person that we realized where the error was coming from. Running a visualization test earlier on would prevent bugs from propogating down the line. We plan to test earlier in the future. 
 
-Another challenege we faced was setting up the ros package in the beginning. There were a few minor steps that we were missing that prevented us from running our python code such as sourcing the setup.bash file. However after solving these problems adding in future nodes was a breeze. 
+Another challenge we faced was setting up the ros package in the beginning. There were a few minor steps that we were missing that prevented us from running our python code such as sourcing the setup.bash file. However after solving these problems adding in future nodes was a breeze. 
 
 
 ## Key Takeaways
