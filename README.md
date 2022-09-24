@@ -57,9 +57,11 @@ However, one disadvantage is that the algorithm is somewhat sensitive to noise i
 ### Demo
 
 ![Wall Follower open path demo](diagrams/gifs/wall_follower_open.gif)
+
 The above video shows our wall follower algorithm cleanly following a wall and handling a corner in a clear environment.
 
 ![Wall Follower cluttered path demo](diagrams/gifs/wall_follower_cluttered.gif)
+
 This demo shows the algorithm following the "wall" of a cluttered environment; more precisely, it keeps the nearest obstacle to its left, which lets it stay away from the objects lining the wall.
 
 ## Person Follower
