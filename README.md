@@ -54,6 +54,14 @@ Our approach comes with several pros and cons. One advantage of our choice to id
 
 However, one disadvantage is that the algorithm is somewhat sensitive to noise in real-world laser scan readings. Especially in hallways exposed to direct sunlight, erroneous LiDAR readings occasionally caused the robot to rotate away from the wall momentarily. While the robot would usually return to wall-following as usual, this behavior is undesirable. Performing further processing on the scan data remains an avenue for future improvement. Additionally, the algorithm currently does not incorporate knowledge of the robot's distance from the wall, and thus tends to follow the wall at roughly the distance at which it started. Incorporating a mode which attempts to control this distance is another avenue for future iteration.
 
+### Demo
+
+![Wall Follower open path demo](diagrams/gifs/wall_follower_open.mp4)
+The above video shows our wall follower algorithm cleanly following a wall and handling a corner in a clear environment.
+
+![Wall Follower cluttered path demo](diagrams/gifs/wall_follower_cluttered.mp4)
+This demo shows the algorithm following the "wall" of a cluttered environment; more precisely, it keeps the nearest obstacle to its left, which lets it stay away from the objects lining the wall.
+
 ## Person Follower
 The goal of the person follower is to direct a robot to follow a person as they walk and move away from the robot. This behavior should keep the robot at a specified distance from the person and stop when there is not a person detected.
 
