@@ -55,7 +55,7 @@ Our approach comes with several pros and cons. One advantage of our choice to id
 However, one disadvantage is that the algorithm is somewhat sensitive to noise in real-world laser scan readings. Especially in hallways exposed to direct sunlight, erroneous LiDAR readings occasionally caused the robot to rotate away from the wall momentarily. While the robot would usually return to wall-following as usual, this behavior is undesirable. Performing further processing on the scan data remains an avenue for future improvement. Additionally, the algorithm currently does not incorporate knowledge of the robot's distance from the wall, and thus tends to follow the wall at roughly the distance at which it started. Incorporating a mode which attempts to control this distance is another avenue for future iteration.
 
 ## Person Follower
-The goal of the person follower is to direct a robot to follow a person as they walk and move away from the robot. This behavior should keep the robot at a specified distance from the person and stop when there is not a person detected. Lidar scan data is used to 
+The goal of the person follower is to direct a robot to follow a person as they walk and move away from the robot. This behavior should keep the robot at a specified distance from the person and stop when there is not a person detected.
 
 ### Diagram
 
@@ -67,7 +67,7 @@ Our algorithm at a high level:
 - Retrieve laser scan data within a specific field of view
 - Find the centroid (shown in green) of the laser scan data
 - Find a vector that will move the robot from its current position to the centroid.
-- Subtract a set follow distance from the vector
+- Subtract a follow distance from the vector
 - Instruct the robot to drive along the vector
 
 Field of View  
@@ -123,7 +123,7 @@ For each behavior we created a new ros node. Each node is a Python class that ho
 ## Challenges
 A large challenge for us was debugging robot behavior, especially in the person follower. There were some problems with our cartesian coordinate conversions that were resulting in unexpected robot behavior. Our normal debugging strategies were not able to solve the problem and it was only after visualizing the centroid of the person that we realized where the error was coming from. Running a visualization test earlier on would prevent bugs from propogating down the line. We plan to test earlier in the future. 
 
-Another challenege we faced was setting up the ros package in the beginning. There were a few minor steps that we were missing that prevented us from running our python code such as sourcing the setup.bash file. However after solving these problems adding in future nodes was a breeze. 
+Another challenge we faced was setting up the ros package in the beginning. There were a few minor steps that we were missing that prevented us from running our python code such as sourcing the setup.bash file. However after solving these problems adding in future nodes was a breeze. 
 
 
 ## Key Takeaways
